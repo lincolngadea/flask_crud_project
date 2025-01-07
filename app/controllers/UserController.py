@@ -58,3 +58,21 @@ def update(user_id):
                         status=500, mimetype='application/json')
     finally:
         session.close()
+
+def destroy(user_id):
+    session = db.session()
+    try:
+        user = session.query(User).filter_by(id=user_id).first()
+        if not user:
+            return Response(json.dumps({"Erro": f"Usuário com ID {user_id} não encontrado"}),
+                            status=404, mimetype='application/json')
+        session.delete(user)
+        session.commit()
+        return Response(json.dumps({"Mensagem": f"Usuário {user_id} deletado com sucesso"}),
+                        status=200, mimetype='application/json')
+    except Exception as e:
+        session.rollback()
+        return Response(json.dumps({"Erro": f"Não foi possível excluir o usuário - Erro: {e}"}),
+                        status=404, mimetype='application/json')
+    finally:
+        session.close()
